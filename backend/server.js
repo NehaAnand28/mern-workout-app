@@ -1,5 +1,6 @@
 require('dotenv').config()//requires dotenv package
 const express = require('express')//requires express package
+const mongoose = require('mongoose')//requires mongoose package
 const workoutRoutes = require('./routes/workouts')
 //creates an express app
 const app = express()
@@ -15,7 +16,7 @@ app.use((req,res,next) => {
 })
 //local middleware -> runs on specific route
 
-//routes
+// *routes*
 //get request handler
 // app.get('/',(req,res) => {
 //     res.json({message: 'Welcome to the APP'})
@@ -23,8 +24,14 @@ app.use((req,res,next) => {
 //workoutRoutes are used when req made to /api/workouts
 app.use('/api/workouts',workoutRoutes)
 
+//connect to the db - asynchronous function returns a promise
+mongoose.connect(process.env.MONGO_URI)
+.then(() => {
+    //listen for requests -> only if connected to db
+    const port = process.env.PORT
+    app.listen(port, () => { console.log(`Connected to db & Listening on port ${port}!!`) })
+})
+.catch((err) => {
+    console.log(err)
+})
 
-
-//listen for requests
-const port = process.env.PORT
-app.listen(port, () => {console.log(`Listening on port ${port}!!`)})
